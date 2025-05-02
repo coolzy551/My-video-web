@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Video web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; }
+    header, footer { background: #222; color: white; text-align: center; padding: 20px; }
+    nav a { margin: 0 10px; color: white; text-decoration: none; cursor: pointer; }
+    main { padding: 20px; max-width: 600px; margin: auto; }
+    .hidden { display: none; }
+    .ad-box { background: #ccc; padding: 15px; text-align: center; margin: 20px 0; }
+    .video-box iframe { width: 100%; height: 300px; }
+    form { background: white; padding: 20px; margin-top: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; }
+    button { background: #333; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Video Site</h1>
+    <nav>
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('videos')">Videos</a>
+      <a onclick="showPage('auth')">Login</a>
+      <a onclick="logout()" id="logoutBtn" class="hidden">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Login/Signup Page -->
+    <div id="auth">
+      <form onsubmit="return false">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Username" required />
+        <input type="password" id="loginPass" placeholder="Password" required />
+        <button onclick="login()">Login</button>
+      </form>
+      <form onsubmit="return false">
+        <h2>Sign Up</h2>
+        <input type="text" id="signupUser" placeholder="New Username" required />
+        <input type="password" id="signupPass" placeholder="New Password" required />
+        <button onclick="signup()">Sign Up</button>
+      </form>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home" class="hidden">
+      <h2>Welcome to My Video Site</h2>
+      <p>Only logged-in users can see this.</p>
+      <div class="ad-box">[Ad goes here]</div>
+    </div>
+
+    <!-- Videos Page -->
+    <div id="videos" class="hidden">
+      <h2>Featured Videos</h2>
+      <div class="video-box">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <div class="ad-box">[Ad goes here]</div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 My Video Site</p>
+  </footer>
+
+  <script>
+    let users = {};
+    let currentUser = null;
+
+    function showPage(id) {
+      if (!currentUser && id !== 'auth') {
+        alert("You must log in first.");
+        return;
+      }
+      ['home', 'videos', 'auth'].forEach(p => {
+        document.getElementById(p).classList.add('hidden');
+      });
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function signup() {
+      const user = signupUser.value.trim();
+      const pass = signupPass.value;
+      if (!user || !pass) return alert("Please fill in both fields.");
+      if (users[user]) return alert("Username already exists.");
+      users[user] = pass;
+      alert("Account created. You can now log in.");
+      signupUser.value = '';
+      signupPass.value = '';
+    }
+
+    function login() {
+      const user = loginUser.value.trim();
+      const pass = loginPass.value;
+      if (users[user] && users[user] === pass) {
+        currentUser = user;
+        alert("Login successful.");
+        showPage('home');
+        logoutBtn.classList.remove('hidden');
+      } else {
+        alert("Invalid username or password.");
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      showPage('auth');
+      logoutBtn.classList.add('hidden');
+    }
+
+    // Initial view
+    showPage('auth');
+  </script>
+</body>
+</html>
