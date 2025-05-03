@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>My Video web</title>
+  <title>My Video Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; color: #333; }
@@ -49,7 +49,10 @@
     <div id="home" class="hidden">
       <h2>Welcome to My Video Site</h2>
       <p>Only logged-in users can see this.</p>
-      <div class="ad-box">[Ad goes here]</div>
+      <div class="ad-box">
+        <!-- AdSense Placeholder -->
+        <p>[Ad goes here]</p>
+      </div>
     </div>
 
     <!-- Videos Page -->
@@ -58,7 +61,10 @@
       <div class="video-box">
         <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
       </div>
-      <div class="ad-box">[Ad goes here]</div>
+      <div class="ad-box">
+        <!-- AdSense Placeholder -->
+        <p>[Ad goes here]</p>
+      </div>
     </div>
   </main>
 
@@ -67,11 +73,11 @@
   </footer>
 
   <script>
-    let users = {};
     let currentUser = null;
 
     function showPage(id) {
-      if (!currentUser && id !== 'auth') {
+      const token = localStorage.getItem('token');
+      if (!token && id !== 'auth') {
         alert("You must log in first.");
         return;
       }
@@ -81,37 +87,45 @@
       document.getElementById(id).classList.remove('hidden');
     }
 
-    function signup() {
+    async function signup() {
       const user = signupUser.value.trim();
       const pass = signupPass.value;
-      if (!user || !pass) return alert("Please fill in both fields.");
-      if (users[user]) return alert("Username already exists.");
-      users[user] = pass;
-      alert("Account created. You can now log in.");
-      signupUser.value = '';
-      signupPass.value = '';
+      const res = await fetch('http://localhost:3000/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+      });
+      const data = await res.json();
+      alert(data.message);
     }
 
-    function login() {
+    async function login() {
       const user = loginUser.value.trim();
       const pass = loginPass.value;
-      if (users[user] && users[user] === pass) {
+      const res = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
         currentUser = user;
         alert("Login successful.");
         showPage('home');
         logoutBtn.classList.remove('hidden');
       } else {
-        alert("Invalid username or password.");
+        alert(data.message);
       }
     }
 
     function logout() {
+      localStorage.removeItem('token');
       currentUser = null;
       showPage('auth');
       logoutBtn.classList.add('hidden');
     }
 
-    // Initial view
     showPage('auth');
   </script>
 </body>
